@@ -216,7 +216,7 @@ def create_app(test_config=None):
   @app.route('/quizzes', methods=['POST'])
   def reteive_quizz_questions():
     body = request.get_json()
-    previous_questions = body.get('previous_questions', None)
+    previous_questions = body.get('previous_questions', [])
     quiz_category = body.get('quiz_category', None)
     try:
       if quiz_category is None:
@@ -243,7 +243,7 @@ def create_app(test_config=None):
         
         return jsonify({
           'success': True,
-          'quesiton': next_question.format()['question']
+          'quesiton': next_question.format()
         })
       else:
         return jsonify({
