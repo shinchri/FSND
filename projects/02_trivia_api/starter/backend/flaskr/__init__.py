@@ -2,6 +2,7 @@ import os
 from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from sqlalchemy import func
 import random
 
 from models import setup_db, Question, Category
@@ -135,6 +136,7 @@ def create_app(test_config=None):
       if search_term:
         selected_questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term))).all()
 
+        # pagination for search doesn't work right on React
         #question_list = paginate_questions(request, selected_questions)
 
 
@@ -187,11 +189,13 @@ def create_app(test_config=None):
       if len(questions) == 0:
         abort(404)
 
-      question_list = paginate_questions(request, questions)
-
+      # pagination doesn't work...
+      # the erro seems to be from the front end
+      #question_list = paginate_questions(request, questions)
+      
       return jsonify({
-        'questions': question_list,
-        'total_questions': len(Question.query.all()),
+        'questions': [question.format() for question in questions],
+        'total_questions': len(questions),
         'current_category': category_id
       })
 
@@ -211,7 +215,45 @@ def create_app(test_config=None):
   '''
   @app.route('/quizzes', methods=['POST'])
   def reteive_quizz_questions():
-    pass
+    body = request.get_json()
+    previous_questions = body.get('previous_questions', None)
+    quiz_category = body.get('quiz_category', None)
+    try:
+      if quiz_category is None:
+        abort(422)
+      
+      category_chosen = quiz_category['id']
+      
+      if category_chosen == 0:
+        quiz_questions = Question.query.order_by(Question.id).all()
+      else:
+        quiz_questions = Question.query.filter_by(category=category_chosen).order_by(Question.id).all()
+   
+      if len(quiz_questions) == 0:
+        abort(404)
+
+      available_questions = []
+
+      for question in quiz_questions:
+        if question not in previous_questions:
+          available_questions.append(question)
+
+      if len(available_questions) != 0:
+        next_question = random.choice(available_questions)
+        
+        return jsonify({
+          'success': True,
+          'quesiton': next_question.format()['question']
+        })
+      else:
+        return jsonify({
+          'success': True,
+          'question': None
+        })
+    except Exception:
+      abort(422)
+    
+
 
   '''
   @TODO: 
