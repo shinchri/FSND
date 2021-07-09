@@ -45,7 +45,11 @@ def create_app(test_config=None):
   '''
   @app.route('/categories', methods=['GET'])
   def retreive_all_categories():
-    pass
+
+    categories = Category.query.order_by(Category.id).all()
+    return jsonify({
+      "category": {category.id: category.type for category in categories}
+    })
 
 
   '''
@@ -63,7 +67,26 @@ def create_app(test_config=None):
   @app.route('/questions', methods=['GET'])
   def retreive_all_questios():
     # page number is provided
-    pass
+
+    questions = Question.query.order_by(Question.id).all()
+
+    question_list = paginate_questions(request, questions)
+
+    #print(questions)
+    print(question_list)
+
+    if len(question_list) == 0:
+      abort(404)
+    else:
+      categories = Category.query.order_by(Category.id).all()
+      return jsonify({
+        "questions": question_list,
+        "total_questions": len(question_list),
+        "current_category": None,
+        "categories": {category.id: category.type for category in categories}
+      })
+
+
 
   '''
   @TODO: 
@@ -72,9 +95,22 @@ def create_app(test_config=None):
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
   '''
-  @app.route('/questions/<int:id>', methods=['DELETE'])
-  def delete_question():
-    pass
+  @app.route('/questions/<int:question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+    try:
+      question = Question.query.filter(Question.id == question_id).one_or_none()
+
+      if question is None:
+        abort(404)
+        
+      question.delete()
+
+      return jsonify({
+        "success": True,
+        "deleted": question_id
+      })
+    except Exception:
+      abort(422)    
 
   '''
   @TODO: 
@@ -110,7 +146,7 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
-  @app.route('/categories/<int:category_id/questions', methods=['GET'])
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def retreive_questions_by_category():
     pass
 
@@ -134,7 +170,7 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
-  @app.errorhandler(400) # 
+  @app.errorhandler(400) # happens when url typo, no variable/data provided
   def bad_request(error):
     return jsonify({
       "success": False,
@@ -158,7 +194,7 @@ def create_app(test_config=None):
       "message": "method not allowed"
     }), 405
 
-  @app.errorhandler(422) 
+  @app.errorhandler(422) # understandable content type, correct syntax, but unable to processed
   def unprocessable(error):
     return jsonify({
       "success": False,
@@ -166,7 +202,6 @@ def create_app(test_config=None):
       "message": "unprocessable"
     }), 422
 
-  
   
   return app
 
