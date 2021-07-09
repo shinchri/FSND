@@ -48,7 +48,7 @@ def create_app(test_config=None):
 
     categories = Category.query.order_by(Category.id).all()
     return jsonify({
-      "category": {category.id: category.type for category in categories}
+      "categories": {category.id: category.type for category in categories}
     })
 
 
@@ -102,7 +102,7 @@ def create_app(test_config=None):
 
       if question is None:
         abort(404)
-        
+
       question.delete()
 
       return jsonify({
@@ -122,9 +122,44 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+  # implementing both posting new question, and searching for questions
   @app.route('/questions', methods=['POST'])
   def create_or_search_question():
-    pass
+    
+    body = request.get_json()
+
+    new_question = body.get('question', None)
+    new_answer = body.get('answer', None)
+    new_difficulty = body.get('difficulty', None)
+    new_category = body.get('category', None)
+    search_term = body.get('searchTerm', None)
+
+    try:
+      if search_term:
+        selected_questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term)))
+
+        question_list = paginate_questions(request, selected_questions)
+
+
+        return jsonify({
+          'questions': question_list,
+          'total_questions': len(question_list),
+          'current_category': None
+        })
+      else:
+        question = Question(new_question, new_answer, new_category, new_difficulty)
+        question.insert()
+
+        questions = Question.query.order_by(Question.id).all()
+        question_list = paginate_questions(request, questions)
+
+        return jsonify({
+          'questions': question_list,
+          'total_questions': len(question_list),
+          'current_category': None
+        })
+    except Exception:
+      abort(422)
 
   '''
   @TODO: 
