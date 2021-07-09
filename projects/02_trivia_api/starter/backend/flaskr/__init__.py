@@ -133,14 +133,14 @@ def create_app(test_config=None):
 
     try:
       if search_term:
-        selected_questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term)))
+        selected_questions = Question.query.order_by(Question.id).filter(Question.question.ilike('%{}%'.format(search_term))).all()
 
-        question_list = paginate_questions(request, selected_questions)
+        #question_list = paginate_questions(request, selected_questions)
 
 
         return jsonify({
-          'questions': question_list,
-          'total_questions': len(question_list),
+          'questions': [question.format() for question in selected_questions],
+          'total_questions': len(selected_questions),
           'current_category': None
         })
       else:
