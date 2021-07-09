@@ -72,16 +72,13 @@ def create_app(test_config=None):
 
     question_list = paginate_questions(request, questions)
 
-    #print(questions)
-    print(question_list)
-
     if len(question_list) == 0:
       abort(404)
     else:
       categories = Category.query.order_by(Category.id).all()
       return jsonify({
         "questions": question_list,
-        "total_questions": len(question_list),
+        "total_questions": len(Question.query.all()),
         "current_category": None,
         "categories": {category.id: category.type for category in categories}
       })
@@ -155,7 +152,7 @@ def create_app(test_config=None):
 
         return jsonify({
           'questions': question_list,
-          'total_questions': len(question_list),
+          'total_questions': len(Question.query.all()),
           'current_category': None
         })
     except Exception:
@@ -182,8 +179,24 @@ def create_app(test_config=None):
   category to be shown. 
   '''
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
-  def retreive_questions_by_category():
-    pass
+  def retreive_questions_by_category(category_id):
+    try:
+
+      questions = Question.query.filter(Question.category == category_id).order_by(Question.id).all()
+
+      if len(questions) == 0:
+        abort(404)
+
+      question_list = paginate_questions(request, questions)
+
+      return jsonify({
+        'questions': question_list,
+        'total_questions': len(Question.query.all()),
+        'current_category': category_id
+      })
+
+    except Exception:
+      abort(422)
 
   '''
   @TODO: 
