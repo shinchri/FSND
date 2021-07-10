@@ -217,17 +217,18 @@ def create_app(test_config=None):
   def reteive_quizz_questions():
     body = request.get_json()
     previous_questions = body.get('previous_questions', [])
-    quiz_category = body.get('quiz_category', None)
+    quiz_category = body.get('quiz_category')
     try:
-      if quiz_category is None:
+      if not quiz_category:
         abort(422)
       
       category_chosen = quiz_category['id']
       
+      quiz_questions = None
       if category_chosen == 0:
         quiz_questions = Question.query.order_by(Question.id).all()
       else:
-        quiz_questions = Question.query.filter_by(category=category_chosen).order_by(Question.id).all()
+        quiz_questions = Question.query.filter_by(category=int(category_chosen)).order_by(Question.id).all()
    
       if len(quiz_questions) == 0:
         abort(404)
@@ -236,14 +237,15 @@ def create_app(test_config=None):
 
       for question in quiz_questions:
         if question not in previous_questions:
-          available_questions.append(question)
+          available_questions.append(question.format())
 
       if len(available_questions) != 0:
         next_question = random.choice(available_questions)
         
+        print(next_question)
         return jsonify({
           'success': True,
-          'quesiton': next_question.format()
+          'question': next_question
         })
       else:
         return jsonify({
