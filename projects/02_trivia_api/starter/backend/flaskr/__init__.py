@@ -214,10 +214,10 @@ def create_app(test_config=None):
   and shown whether they were correct or not. 
   '''
   @app.route('/quizzes', methods=['POST'])
-  def reteive_quizz_questions():
+  def retreive_quiz_questions():
     body = request.get_json()
     previous_questions = body.get('previous_questions', [])
-    quiz_category = body.get('quiz_category')
+    quiz_category = body.get('quiz_category', None)
     try:
       if not quiz_category:
         abort(422)
@@ -234,15 +234,15 @@ def create_app(test_config=None):
         abort(404)
 
       available_questions = []
-
+      
       for question in quiz_questions:
-        if question not in previous_questions:
+        if question.id not in previous_questions:
           available_questions.append(question.format())
 
       if len(available_questions) != 0:
         next_question = random.choice(available_questions)
+        print(len(next_question))
         
-        print(next_question)
         return jsonify({
           'success': True,
           'question': next_question
