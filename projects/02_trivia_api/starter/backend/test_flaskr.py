@@ -15,25 +15,25 @@ categories = [
 ]
 
 questions = [
-    {"question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", "answer": "Maya Angelou", "difficulty": 2, "category": 4},
-    {"question": "What boxer's original name is Cassius Clay?", "answer": "Muhammad Ali", "difficulty": 1, "category": 4},
-    {"question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?", "answer": "Apollo 13", "difficulty": 4, "category": 5},
-    {"question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?", "answer": "Tom Cruise", "difficulty": 4, "category": 5},
-    {"question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?", "answer": "Edward Scissorhands", "difficulty": 3, "category": 5},
-    {"question": "Which is the only team to play in every soccer World Cup tournament?", "answer": "Brazil", "difficulty": 3, "category": 6},
-    {"question": "Which country won the first ever soccer World Cup in 1930?", "answer": "Uruguay", "difficulty": 4, "category": 6},
-    {"question": "Who invented Peanut Butter?", "answer": "George Washington Carver", "difficulty": 2, "category": 4},
-    {"question": "What is the largest lake in Africa?", "answer": "Lake Victoria", "difficulty": 2, "category": 3},
-    {"question": "In which royal palace would you find the Hall of Mirrors?", "answer": "", "difficulty": 3, "category": 3},
-    {"question": "The Taj Mahal is located in which Indian city?", "answer": "", "difficulty": 2, "category": 3},
-    {"question": "Which Dutch graphic artist–initials M C was a creator of optical illusions?", "answer": "Escher", "difficulty": 1, "category": 2},
-    {"question": "La Giaconda is better known as what?", "answer": "Mona Lisa", "difficulty": 3, "category": 2},
-    {"question": "How many paintings did Van Gogh sell in his lifetime?", "answer": "One", "difficulty": 4, "category": 2},
-    {"question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?", "answer": "Jackson Pollock", "difficulty": 2, "category": 2},
-    {"question": "What is the heaviest organ in the human body?", "answer": "The Liver", "difficulty": 4, "category": 1},
-    {"question": "Who discovered penicillin?", "answer": "Alexander Fleming", "difficulty": 3, "category": 1},
-    {"question": "Hematology is a branch of medicine involving the study of what?", "answer": "Blood", "difficulty": 4, "category": 1},
-    {"question": "Which dung beetle was worshipped by the ancient Egyptians?", "answer": "Scarab", "difficulty": 4, "category": 4}
+    {"id":1, "question": "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?", "answer": "Maya Angelou", "difficulty": 2, "category": 4},
+    {"id":2,"question": "What boxer's original name is Cassius Clay?", "answer": "Muhammad Ali", "difficulty": 1, "category": 4},
+    {"id":3,"question": "What movie earned Tom Hanks his third straight Oscar nomination, in 1996?", "answer": "Apollo 13", "difficulty": 4, "category": 5},
+    {"id":4,"question": "What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?", "answer": "Tom Cruise", "difficulty": 4, "category": 5},
+    {"id":5,"question": "What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?", "answer": "Edward Scissorhands", "difficulty": 3, "category": 5},
+    {"id":6,"question": "Which is the only team to play in every soccer World Cup tournament?", "answer": "Brazil", "difficulty": 3, "category": 6},
+    {"id":7,"question": "Which country won the first ever soccer World Cup in 1930?", "answer": "Uruguay", "difficulty": 4, "category": 6},
+    {"id":8,"question": "Who invented Peanut Butter?", "answer": "George Washington Carver", "difficulty": 2, "category": 4},
+    {"id":9,"question": "What is the largest lake in Africa?", "answer": "Lake Victoria", "difficulty": 2, "category": 3},
+    {"id":10,"question": "In which royal palace would you find the Hall of Mirrors?", "answer": "The Palace of Versailles", "difficulty": 3, "category": 3},
+    {"id":11,"question": "The Taj Mahal is located in which Indian city?", "answer": "Agra", "difficulty": 2, "category": 3},
+    {"id":12,"question": "Which Dutch graphic artist–initials M C was a creator of optical illusions?", "answer": "Escher", "difficulty": 1, "category": 2},
+    {"id":13,"question": "La Giaconda is better known as what?", "answer": "Mona Lisa", "difficulty": 3, "category": 2},
+    {"id":14,"question": "How many paintings did Van Gogh sell in his lifetime?", "answer": "One", "difficulty": 4, "category": 2},
+    {"id":15,"question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?", "answer": "Jackson Pollock", "difficulty": 2, "category": 2},
+    {"id":16,"question": "What is the heaviest organ in the human body?", "answer": "The Liver", "difficulty": 4, "category": 1},
+    {"id":17,"question": "Who discovered penicillin?", "answer": "Alexander Fleming", "difficulty": 3, "category": 1},
+    {"id":18,"question": "Hematology is a branch of medicine involving the study of what?", "answer": "Blood", "difficulty": 4, "category": 1},
+    {"id":19,"question": "Which dung beetle was worshipped by the ancient Egyptians?", "answer": "Scarab", "difficulty": 4, "category": 4}
 ]
 
 class TriviaTestCase(unittest.TestCase):
@@ -64,27 +64,31 @@ class TriviaTestCase(unittest.TestCase):
             self.db.init_app(self.app)
             # create all tables
             self.db.create_all()
-
-            # for category in categories:
-            #     obj = Category(type=category['type'])
-            #     self.db.session.add(obj)
+            self.db.session.execute('ALTER SEQUENCE "Category_id_seq" RESTART WITH 1')
+            self.db.session.execute('ALTER SEQUENCE "Question_id_seq" RESTART WITH 1')
+            for category in categories:
+                obj = Category(type=category['type'])
+                self.db.session.add(obj)
                 
-            #     self.db.session.commit()
+                self.db.session.commit()
 
-            # for question in questions:
-            #     obj = Question(question=question['question'], answer=question['answer'], category=question['category'], difficulty=question['difficulty'])
-            #     self.db.session.add(obj)
+            for question in questions:
+                obj = Question(question=question['question'], answer=question['answer'], category=question['category'], difficulty=question['difficulty'])
+                self.db.session.add(obj)
             
-            #     self.db.session.commit()
+                self.db.session.commit()
 
-            #     self.db.session.close()
+                self.db.session.close()
         
     
     def tearDown(self):
         """Executed after reach test"""
-        # print("s;dfnk;sldkfn")
-        # with self.app.app_context():
-        #     self.db.drop_all(app=self.app)
+        with self.app.app_context():
+            self.db.session.query(Question).delete()
+            self.db.session.query(Category).delete()
+            self.db.session.commit()
+            self.db.session.close()
+            self.db.drop_all()
 
     
 
@@ -174,7 +178,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(question, None)
 
     def test_422_delete_none_existing_question(self):
-        res = self.client().delete('/questions/1')
+        res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
@@ -199,7 +203,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['question']), 5) # there are five key,value pair in the dictionary
 
     def test_retrieve_quiz_questions_with_previous_questions(self):
-        res = self.client().post('/quizzes', json={'previous_questions':[13,14,15],'quiz_category': {"type":"geography","id":3}})
+        res = self.client().post('/quizzes', json={'previous_questions':[9,10,11],'quiz_category': {"type":"geography","id":3}})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -207,7 +211,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertIsNone(data['question'])
 
     def test_422_invalid_category_id(self):
-        res = self.client().post('/quizzes', json={'previous_questions':[13,14,15],'quiz_category': {"type":"geography","id":10}})
+        res = self.client().post('/quizzes', json={'previous_questions':[9,10,11],'quiz_category': {"type":"geography","id":10}})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 422)
