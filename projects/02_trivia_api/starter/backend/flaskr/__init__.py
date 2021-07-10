@@ -69,16 +69,17 @@ def create_app(test_config=None):
   def retreive_all_questios():
     # page number is provided
 
-    questions = Question.query.order_by(Question.id).all()
+    # pagination in Postgres
+    selected_page = request.args.get('page', 1, type=int)
+    current_index = selected_page-1
+    questions = Question.query.order_by(Question.id).limit(QUESTIONS_PER_PAGE).offset(current_index*QUESTIONS_PER_PAGE).all()
 
-    question_list = paginate_questions(request, questions)
-
-    if len(question_list) == 0:
+    if len(questions) == 0:
       abort(404)
     else:
       categories = Category.query.order_by(Category.id).all()
       return jsonify({
-        "questions": question_list,
+        "questions": [question.format() for question in questions],
         "total_questions": len(Question.query.all()),
         "current_category": None,
         "categories": {category.id: category.type for category in categories}
