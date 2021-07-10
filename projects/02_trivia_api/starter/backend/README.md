@@ -126,7 +126,7 @@ GET '/api/v1.0/categories'
 Errors are returned as JSON object:
 ```json
 {
-    "success": False,
+    "success": false,
     "error": 422,
     "message": "unprocessable"
 }
