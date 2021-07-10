@@ -94,9 +94,7 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)
     
         self.assertEqual(res.status_code, 200)
-        self.assertTrue(data['questions'])
-        self.assertGreater(data['total_questions'], 0)
-        self.assertEqual(data['current_category'], None)
+        self.assertTrue(data['success'])
 
     def test_search_questions(self):
         res = self.client().post('/questions', json={"searchTerm": 'title'})

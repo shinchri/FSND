@@ -149,13 +149,9 @@ def create_app(test_config=None):
         question = Question(new_question, new_answer, new_category, new_difficulty)
         question.insert()
 
-        questions = Question.query.order_by(Question.id).all()
-        question_list = paginate_questions(request, questions)
 
         return jsonify({
-          'questions': question_list,
-          'total_questions': len(Question.query.all()),
-          'current_category': None
+          'success': True
         })
     except Exception:
       abort(422)
@@ -241,7 +237,6 @@ def create_app(test_config=None):
 
       if len(available_questions) != 0:
         next_question = random.choice(available_questions)
-        print(len(next_question))
         
         return jsonify({
           'success': True,
