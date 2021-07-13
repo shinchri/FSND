@@ -75,6 +75,18 @@ def get_drinks_detail(payload):
 def create_drinks(payload):
     try:
         body = request.get_json()
+        title = body.get('title', None)
+        recipe = body.get('recipe', None)
+
+        if title==None or recipe==None:
+            abort(422)
+        drink = Drink(title=title, recipe=recipe)
+        drink.inset()
+
+        return jsonify({
+            "success": True,
+            "drinks": drink.long()
+        }), 200
 
     except Exception:
         abort(422)
