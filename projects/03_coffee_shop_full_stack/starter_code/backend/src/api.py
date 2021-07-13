@@ -31,7 +31,7 @@ CORS(app)
 @app.route('/drinks', methods=["GET"])
 def get_drink():
     drinks = Drink.query.order_by(Drink.id).all()
-    if not drinks:
+    if len(drinks)==0:
         abort(404)
     
     return jsonify({
@@ -70,6 +70,14 @@ def get_drinks_detail(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=["POST"])
+@requires_auth('post:drinks')
+def create_drinks(payload):
+    try:
+        body = request.get_json()
+
+    except Exception:
+        abort(422)
 
 
 '''
