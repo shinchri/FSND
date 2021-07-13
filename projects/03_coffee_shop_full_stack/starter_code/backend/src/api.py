@@ -17,7 +17,7 @@ CORS(app)
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 !! Running this funciton will add one
 '''
-# db_drop_and_create_all()
+#db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -80,8 +80,8 @@ def create_drinks(payload):
 
         if title==None or recipe==None:
             abort(422)
-        drink = Drink(title=title, recipe=recipe)
-        drink.inset()
+        drink = Drink(title=title, recipe=json.dumps(recipe))
+        drink.insert()
 
         return jsonify({
             "success": True,
@@ -112,15 +112,13 @@ def edit_drinks(payload, id):
         if drink==None:
             abort(404)
 
-        title = request.get_json('title', None)
-        recipe = request.get_json('recipe', None)
+        body = request.get_json()
 
-        if title==None or recipe==None:
-            abort(422)
+        drink.title = body.get('title', drink.title)
+        recipe = json.dumps(body.get('recipe'))
 
-        drink.title = title
-        drink.recipe = recipe
-
+        drink.recipe = recipe if recipe != None else drink.recipe
+        
         drink.update()
         return jsonify({
             "success": True,
